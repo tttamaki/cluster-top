@@ -40,7 +40,8 @@ type Memory struct {
 
 func FetchMemory(m *Memory) {
 	m.Total, m.Free, m.Available = proc.GetRAMMemoryInfo()
-	m.Used = m.Total - m.Free
+//	m.Used = m.Total - m.Free
+	m.Used = m.Total - m.Available
 	m.Usage = float32(100 * float64(m.Used) / float64(m.Total))
 }
 
@@ -115,7 +116,7 @@ func (c *Cluster) Print(show_time bool) {
 
 	table := termtables.CreateTable()
 
-	tableHeader := []interface{}{"Node", "RAM-Util", "wa", "PID", "User", "Command", "CPU-Util"}
+	tableHeader := []interface{}{"Node", "RAM-Util", "wa", "cores", "PID", "User", "Command", "CPU-Util"}
 	if show_time {
 		tableHeader = append(tableHeader, "Last Seen")
 	}
@@ -141,6 +142,7 @@ func (c *Cluster) Print(show_time bool) {
 				"",
 				"",
 				"",
+				"",
 			}
 
 			if show_time {
@@ -154,6 +156,7 @@ func (c *Cluster) Print(show_time bool) {
 				name := ""
 				memory := ""
 				wa := ""
+				cores := ""
 
 				if p_id == 0 {
 					name = n.Name
@@ -164,12 +167,14 @@ func (c *Cluster) Print(show_time bool) {
 					)
 
 					wa = fmt.Sprintf("%0.1f", n.Cpu.RelativeIoWait())
+					cores = fmt.Sprintf("%2d", n.Cpu.Cores)
 				}
 
 				tableRow := []interface{}{
 					name,
 					memory,
 					wa,
+					cores,
 					p.Info.PID,
 					p.Username,
 					p.Info.Command,
