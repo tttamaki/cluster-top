@@ -10,4 +10,3 @@ cluster-top.env
 cpuinfo
 cpuinfo.go
 
-config.go

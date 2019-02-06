@@ -122,6 +122,8 @@ func (c *Cluster) Print(show_time bool) {
 	}
 	table.AddHeaders(tableHeader...)
 
+	cfg := LoadConfig()
+
 	for n_id, n := range c.Nodes {
 
 		node_lastseen := n.Time.Format("Mon Jan 2 15:04:05 2006")
@@ -181,6 +183,13 @@ func (c *Cluster) Print(show_time bool) {
 					strconv.Itoa(int(p.Usage)) + "%",
 				}
 
+				if ! (p.Usage > cfg.MinUsage) {
+					tableRow[4] = "" // pid
+					tableRow[5] = "" // username
+					tableRow[6] = "" // command
+					tableRow[7] = "" // usage
+				}
+
 				if show_time {
 					if p_id == 0 {
 						tableRow = append(tableRow, node_lastseen)
@@ -192,7 +201,9 @@ func (c *Cluster) Print(show_time bool) {
 
 				}
 
-				table.AddRow(tableRow...)
+				if p.Usage > cfg.MinUsage || p_id == 0 {
+					table.AddRow(tableRow...)
+				}
 				table.SetAlign(termtables.AlignRight, 2)
 
 			}
